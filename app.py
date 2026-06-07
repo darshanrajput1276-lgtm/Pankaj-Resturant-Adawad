@@ -70,7 +70,7 @@ st.markdown("""
 
 
 # --- SHOP REGISTRATION DATA ---
-SHOP_WHATSAPP_NUMBER = "919623886387" 
+SHOP_WHATSAPP_NUMBER = "918623864774" 
 
 # --- INITIALIZE DATABASE VIA SESSION STATE ---
 if "menu_data" not in st.session_state:
