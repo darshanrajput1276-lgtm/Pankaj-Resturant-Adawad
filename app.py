@@ -95,7 +95,7 @@ if app_mode == "✨ Order Sweets & Snacks":
     else:
         st.title("पंकज रेस्टोरेंट अँड स्वीट्स - अडावद")
     
-    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>🍽️ शुद्धता, गुणवत्ता आणि अप्रतिम चव यांचा संगम!ा !! आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारले जातील.</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>🍽️ शुद्धता, गुणवत्ता आणि अप्रतिम चव यांचा संगमा  !! आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारले जातील.</h4>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns([1.8, 1.2])
