@@ -31,9 +31,9 @@ DEFAULT_MENU = {
         {"name": "Aloo Vada / बटाटा वडा (Per Pc)", "price": 20, "desc": "Deep fried spiced potato dumpling / paramparik chavdar batata vada"},
         {"name": "Samosa / समोसा (Per Pc)", "price": 10, "desc": "Crispy pastry with spiced potatoes / गरमागरम बटाटा सारण भरलेला कुरकुरीत समोसा"},
         {"name": "Kachori / कचोरी (Per Pc)", "price": 10, "desc": "Flaky crust with savory lentil filling / खमंग मसाला आणि डाळीने भरलेली शेव कचोरी"},
-        {"name": "Jalebi / जिलेबी (250g)", "price": 75, "desc": "Soft, juicy and crispy tempered with ghee / शुद्ध तुपात तळलेली कुरकुरीत रसाळ जिलेबी"},
-        {"name": "Bhajiya / भजी (Per Plate)", "price": 30, "desc": "Crispy fried onion or potato fritters / गरमागरम आणि कुरकुरीत कांदा किंवा बटाटा भजी"},
-        {"name": "Poha / पोहे (Per Plate)", "price": 20, "desc": "Traditional spiced flattened rice / सुप्रसिद्ध चवदार कांदा पोहे"},
+        {"name": "Jalebi / जिलेबी (250g)", "price": 30, "desc": "Soft, juicy and crispy tempered with ghee / शुद्ध तुपात तळलेली कुरकुरीत रसाळ जिलेबी"},
+        {"name": "Bhajiya / भजी (Per Plate)", "price": 10, "desc": "Crispy fried onion or potato fritters / गरमागरम आणि कुरकुरीत कांदा किंवा बटाटा भजी"},
+        {"name": "Poha / पोहे (Per Plate)", "price": 10, "desc": "Traditional spiced flattened rice / सुप्रसिद्ध चवदार कांदा पोहे"},
     ],
 }
 
@@ -95,7 +95,7 @@ if app_mode == "✨ Order Sweets & Snacks":
     else:
         st.title("पंकज रेस्टोरेंट अँड स्वीट्स - अडावद")
     
-    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>उत्तम क्वालिटी व चविष्ट नास्ता !! आमच्याकडे सर्व प्रकारचे आदेश स्वीकारल्या जातील.</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>🍽️ शुद्धता, गुणवत्ता आणि अप्रतिम चव यांचा संगम!ा !! आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारले जातील.</h4>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns([1.8, 1.2])
