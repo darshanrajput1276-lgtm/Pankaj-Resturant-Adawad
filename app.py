@@ -3,6 +3,7 @@ import urllib.parse
 from PIL import Image
 import os
 import json
+from datetime import datetime
 
 # Set page configuration
 st.set_page_config(
@@ -14,6 +15,7 @@ st.set_page_config(
 # --- CONFIGURATION & STORAGE ---
 SHOP_WHATSAPP_NUMBER = "918623864774" 
 DATA_FILE = "menu.json"
+ORDERS_FILE = "orders.json"
 ADMIN_PASSWORD = "pankaj_admin"  
 MAPS_URL = "https://www.google.com/maps/place/Pankaj+Restaurant/@21.221159,75.4379684,17z/data=!3m1!4b1!4m6!3m5!1s0x3bd8e3005bbea4c9:0xab8ea2e4475c5b41!8m2!3d21.221159!4d75.4405433!16s%2Fg%2F11zkrvhsft?entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D"
 
@@ -37,7 +39,7 @@ DEFAULT_MENU = {
     ],
 }
 
-# Helper functions to load and save data permanently
+# --- DB CONTROLLERS ---
 def load_menu():
     if os.path.exists(DATA_FILE):
         try:
@@ -55,24 +57,54 @@ def save_menu(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-# Initialize session state for menu data
+def load_orders():
+    if os.path.exists(ORDERS_FILE):
+        try:
+            with open(ORDERS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+def save_order(order_object):
+    orders = load_orders()
+    orders.append(order_object)
+    with open(ORDERS_FILE, "w", encoding="utf-8") as f:
+        json.dump(orders, f, ensure_ascii=False, indent=4)
+
+# --- INITIALIZATION ---
 if "menu_data" not in st.session_state:
     st.session_state.menu_data = load_menu()
 
 if "cart" not in st.session_state:
     st.session_state.cart = {}
 
+# Form fields persistent state keys to clear on registration refresh loops
+if "cust_name" not in st.session_state:
+    st.session_state.cust_name = ""
+if "cust_phone" not in st.session_state:
+    st.session_state.cust_phone = ""
+if "cust_address" not in st.session_state:
+    st.session_state.cust_address = ""
+if "order_submitted" not in st.session_state:
+    st.session_state.order_submitted = False
+
+def clear_order_session():
+    st.session_state.cart = {}
+    st.session_state.cust_name = ""
+    st.session_state.cust_phone = ""
+    st.session_state.cust_address = ""
+    st.session_state.order_submitted = False
+    st.rerun()
+
 # --- SIDEBAR LOGO & NAVIGATION ---
 st.sidebar.markdown("<center>", unsafe_allow_html=True)
-
-# Checks for logo images, defaults to text title if missing
 if os.path.exists("viru logo copy.jpg"):
     st.sidebar.image(Image.open("viru logo copy.jpg"), use_container_width=True)
 elif os.path.exists("viru logo cmyk.jpg"):
     st.sidebar.image(Image.open("viru logo cmyk.jpg"), use_container_width=True)
 else:
     st.sidebar.title("🏪 पंकज रेस्टोरेंट")
-
 st.sidebar.markdown("</center>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 app_mode = st.sidebar.radio("पंकज रेस्टोरेंट मेनू:", ["✨ Order Sweets & Snacks", "🔒 Admin Dashboard"])
@@ -96,7 +128,6 @@ if app_mode == "✨ Order Sweets & Snacks":
 
     col1, col2 = st.columns([1.8, 1.2])
 
-    # Left Column: Interactive Menu List & Showcase Image
     with col1:
         st.header("📋 Explore Our Menu / आमचा मेनू")
         
@@ -134,7 +165,6 @@ if app_mode == "✨ Order Sweets & Snacks":
                             st.rerun()
                 st.markdown("---")
 
-    # Right Column: Cart System & WhatsApp Generation
     with col2:
         st.header("🛒 Your Basket / तुमची टोपली")
 
@@ -144,11 +174,13 @@ if app_mode == "✨ Order Sweets & Snacks":
             total_bill = 0
             items_to_remove = []
             order_summary_text = ""
+            cart_items_list = []
 
             for item_name, details in list(st.session_state.cart.items()):
                 item_total = details["price"] * details["qty"]
                 total_bill += item_total
                 order_summary_text += f"- {item_name} x {details['qty']} (₹{item_total})\n"
+                cart_items_list.append(f"{item_name} (x{details['qty']})")
 
                 cart_col1, cart_col2 = st.columns([3, 1])
                 with cart_col1:
@@ -166,12 +198,11 @@ if app_mode == "✨ Order Sweets & Snacks":
             st.markdown("---")
             st.write(f"### **Total Amount: ₹{total_bill}**")
 
-            # Form fields
             st.subheader("🚚 Delivery Details / पत्ता तपशील")
-            name = st.text_input("Your Name*", placeholder="Enter full name").strip()
-            phone = st.text_input("Phone Number*", placeholder="10-digit mobile number").strip()
+            name = st.text_input("Your Name*", value=st.session_state.cust_name, placeholder="Enter full name", key="input_name").strip()
+            phone = st.text_input("Phone Number*", value=st.session_state.cust_phone, placeholder="10-digit mobile number", key="input_phone").strip()
             order_type = st.radio("Order Type", ["Home Delivery / घरपोच सेवा", "Store Pickup / दुकानातून घेणे"])
-            address = st.text_area("Delivery Address", placeholder="Required for Home Delivery (घरपोच सेवेसाठी आवश्यक)").strip()
+            address = st.text_area("Delivery Address", value=st.session_state.cust_address, placeholder="Required for Home Delivery", key="input_address").strip()
 
             if st.button("Place Order via WhatsApp ✅", use_container_width=True):
                 if not name or not phone:
@@ -179,13 +210,23 @@ if app_mode == "✨ Order Sweets & Snacks":
                 elif "Home Delivery" in order_type and not address:
                     st.error("Please provide a delivery address.")
                 else:
-                    customer_phone = str(phone)
-                    customer_name = str(name)
+                    # Save metrics into orders file database instantly
+                    new_order_record = {
+                        "date": datetime.now().strftime("%Y-%m-%d"),
+                        "time": datetime.now().strftime("%H:%M:%S"),
+                        "customer": name,
+                        "phone": phone,
+                        "type": order_type,
+                        "address": address if "Home Delivery" in order_type else "N/A",
+                        "items": ", ".join(cart_items_list),
+                        "total": total_bill
+                    }
+                    save_order(new_order_record)
                     
                     whatsapp_msg = (
                         f"🔔 *NEW ORDER - PANKAJ RESTAURANT & SWEETS*\n\n"
-                        f"👤 *Customer:* {customer_name}\n"
-                        f"📞 *Phone:* {customer_phone}\n"
+                        f"👤 *Customer:* {name}\n"
+                        f"📞 *Phone:* {phone}\n"
                         f"📦 *Type:* {order_type}\n"
                         f"📍 *Address:* {address if 'Home Delivery' in order_type else 'N/A'}\n\n"
                         f"📋 *Items Ordered:*\n{order_summary_text}\n"
@@ -194,18 +235,24 @@ if app_mode == "✨ Order Sweets & Snacks":
                     )
                     
                     encoded_msg = urllib.parse.quote(whatsapp_msg)
-                    whatsapp_url = f"https://wa.me/{SHOP_WHATSAPP_NUMBER}?text={encoded_msg}"
-                    
-                    st.success("🎉 Order formatted cleanly!")
-                    st.markdown(f'[👉 Click Here to Complete Order on WhatsApp]({whatsapp_url})')
+                    st.session_state.whatsapp_url = f"https://wa.me/{SHOP_WHATSAPP_NUMBER}?text={encoded_msg}"
+                    st.session_state.order_submitted = True
+                    st.rerun()
+
+            if st.session_state.order_submitted:
+                st.success("🎉 Order processed and recorded into database!")
+                st.markdown(f'[👉 CLICK HERE TO SEND TO WHATSAPP]({st.session_state.whatsapp_url})')
+                st.markdown("---")
+                if st.button("🔄 Clear Basket & Start New Order", type="primary", use_container_width=True):
+                    clear_order_session()
 
 
 # ==============================================================================
-# VIEW 2: MANAGEMENT CONTROL
+# VIEW 2: MANAGEMENT CONTROL & ANALYTICS DASHBOARD
 # ==============================================================================
 elif app_mode == "🔒 Admin Dashboard":
     st.title("🛠️ Pankaj Restaurant - Management Panel")
-    st.caption("Add stock or alter items instantaneously.")
+    st.caption("Track store analytics and manipulate store configurations.")
     st.markdown("---")
 
     passwd_input = st.text_input("Enter Admin Password to Unlock Panel", type="password")
@@ -213,6 +260,34 @@ elif app_mode == "🔒 Admin Dashboard":
     if passwd_input == ADMIN_PASSWORD:
         st.success("Access Granted!")
         
+        # --- NEW LIVE TRACKING ANALYTICS DASHBOARD SECTION ---
+        st.header("📊 Today's Real-Time Analytics")
+        all_orders = load_orders()
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        
+        # Filter metrics
+        today_orders = [o for o in all_orders if o.get("date") == today_str]
+        today_count = len(today_orders)
+        today_revenue = sum([int(o.get("total", 0)) for o in today_orders])
+        
+        stat_col1, stat_col2, stat_col3 = st.columns(3)
+        with stat_col1:
+            st.metric(label="📦 Today's Total Orders", value=f"{today_count} Orders")
+        with stat_col2:
+            st.metric(label="💰 Today's Revenue Generated", value=f"₹{today_revenue}")
+        with stat_col3:
+            st.metric(label="📈 Lifetime System Orders Saved", value=f"{len(all_orders)}")
+            
+        st.subheader("📋 Recent Orders Activity Log")
+        if all_orders:
+            # Display reverse log so newer items appear first
+            st.dataframe(all_orders[::-1], use_container_width=True)
+        else:
+            st.info("No recorded orders found in the database system yet.")
+            
+        st.markdown("---")
+        
+        # --- MENU ITEMS MANAGEMENT ---
         st.subheader("➕ Add New Item to Menu")
         with st.form("add_item_form", clear_on_submit=True):
             new_category = st.selectbox("Select Category", list(st.session_state.menu_data.keys()))
@@ -233,9 +308,7 @@ elif app_mode == "🔒 Admin Dashboard":
         st.markdown("---")
         st.subheader("⚙️ Current Inventory Management")
         
-        # Track layout adjustments during continuous loop execution
         action_triggered = False
-
         for category, items in st.session_state.menu_data.items():
             st.write(f"### {category}")
             
