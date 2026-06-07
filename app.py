@@ -11,33 +11,44 @@ st.set_page_config(
     layout="wide",
 )
 
-# --- BRIGHT & ANIMATED VISUAL THEME (CSS Injection) ---
+# --- BRIGHT, HIGH-CONTRAST & ANIMATED VISUAL THEME ---
 st.markdown("""
     <style>
-    /* Global Background and Bright Accents */
+    /* Light vibrant background */
     .stApp {
-        background: linear-gradient(135deg, #FFF9E6 0%, #FFFFFF 100%);
+        background: linear-gradient(135deg, #FFFDF6 0%, #FFFFFF 100%);
     }
     
-    /* Smooth Fade-In Animation for Content */
+    /* CRITICAL COLOR FIX: Force all text labels to be highly visible */
+    .product-title {
+        color: #1A1A1A !important;
+        font-size: 1.15rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 2px !important;
+    }
+    .product-desc {
+        color: #555555 !important;
+        font-size: 0.9rem !important;
+    }
+    .product-price {
+        color: #C62828 !important;
+        font-size: 1.1rem !important;
+        font-weight: bold !important;
+    }
+    
+    /* Smooth Fade-In Animation for Main Page */
     @keyframes fadeIn {
-        0% { opacity: 0; transform: translateY(10px); }
+        0% { opacity: 0; transform: translateY(15px); }
         100% { opacity: 1; transform: translateY(0); }
     }
     .block-container {
         animation: fadeIn 0.8s ease-out;
     }
 
-    /* Vibrant Headings */
-    h1, h2, h3 {
-        color: #D32F2F !important;
-        font-family: 'Poppins', sans-serif;
-    }
-    
-    /* Interactive Pulsing "Add to Cart" Buttons */
+    /* Interactive Pulsing Buttons */
     @keyframes pulse {
         0% { transform: scale(1); }
-        50% { transform: scale(1.03); box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4); }
+        50% { transform: scale(1.04); box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4); }
         100% { transform: scale(1); }
     }
     
@@ -55,25 +66,52 @@ st.markdown("""
         animation: pulse 1s infinite;
     }
 
-    /* Styling for Out of Stock items */
+    /* Out of Stock Indicator Style */
     .oos-badge {
-        background-color: #ffebee;
-        color: #c62828;
-        padding: 4px 10px;
-        border-radius: 10px;
+        background-color: #FFEBEE;
+        color: #C62828;
+        padding: 5px 12px;
+        border-radius: 20px;
         font-weight: bold;
         display: inline-block;
-        border: 1px solid #ffb3b3;
+        border: 1px solid #FFB3B3;
+        text-align: center;
+    }
+
+    /* Animated Google Maps Button CSS */
+    @keyframes bounceGlow {
+        0%, 100% { transform: translateY(0); box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); }
+        50% { transform: translateY(-6px); box-shadow: 0 10px 20px rgba(76, 175, 80, 0.6); }
+    }
+    .map-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+        color: white !important;
+        padding: 12px 20px;
+        border-radius: 25px;
+        text-decoration: none !important;
+        font-weight: bold;
+        font-size: 0.95rem;
+        margin: 15px 0;
+        animation: bounceGlow 2.5s infinite ease-in-out;
+        transition: all 0.3s ease;
+        border: 1px solid #1B5E20;
+    }
+    .map-btn:hover {
+        filter: brightness(1.1);
     }
     </style>
 """, unsafe_allow_html=True)
 
 # --- CONFIGURATION & STORAGE ---
-SHOP_WHATSAPP_NUMBER = "919623886387" 
+SHOP_WHATSAPP_NUMBER = "918623864774" 
 DATA_FILE = "menu.json"
-ADMIN_PASSWORD = "pankaj_admin"  # Change this to your preferred admin password
+ADMIN_PASSWORD = "pankaj_admin"
 
-# Default menu items with an 'available' flag added
+MAPS_URL = "https://www.google.com/maps/place/Pankaj+Restaurant/@21.221159,75.4379684,17z/data=!3m1!4b1!4m6!3m5!1s0x3bd8e3005bbea4c9:0xab8ea2e4475c5b41!8m2!3d21.221159!4d75.4405433!16s%2Fg%2F11zkrvhsft?entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D"
+
 DEFAULT_MENU = {
     "Sweets 👑": [
         {"name": "Kaju Katli (1kg)", "price": 800, "desc": "Premium cashew sweet made with 100% silver foil", "available": True},
@@ -89,7 +127,6 @@ DEFAULT_MENU = {
     ],
 }
 
-# Helper functions to load and save data permanently
 def load_menu():
     if os.path.exists(DATA_FILE):
         try:
@@ -103,7 +140,6 @@ def save_menu(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-# Initialize session state for menu data
 if "menu_data" not in st.session_state:
     st.session_state.menu_data = load_menu()
 
@@ -112,8 +148,8 @@ if "cart" not in st.session_state:
 
 # --- SIDEBAR LOGO & NAVIGATION ---
 st.sidebar.markdown("<center>", unsafe_allow_html=True)
-if os.path.exists("logo.jpg"):
-    logo_img = Image.open("logo.jpg")
+if os.path.exists("viru logo cmyk.jpg"):
+    logo_img = Image.open("viru logo cmyk.jpg")
     st.sidebar.image(logo_img, use_column_width=True)
 else:
     st.sidebar.title("🏪 पंकज रेस्टोरेंट")
@@ -122,20 +158,25 @@ st.sidebar.markdown("</center>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 app_mode = st.sidebar.radio("पंकज रेस्टोरेंट मेनू:", ["✨ Order Sweets & Snacks", "🔒 Admin Dashboard"])
 st.sidebar.markdown("---")
+
 st.sidebar.info("📍 पत्ता: अडावद\n📞 मो. 9623886387")
+
+# Animated Location Button inside Sidebar
+st.sidebar.markdown(f'<a href="{MAPS_URL}" target="_blank" class="map-btn">📍 Find Us on Google Maps 🗺️</a>', unsafe_allow_html=True)
 
 
 # ==============================================================================
 # VIEW 1: BRANDED CUSTOMER MENU
 # ==============================================================================
 if app_mode == "✨ Order Sweets & Snacks":
-    if os.path.exists("banner.jpg"):
-        banner_img = Image.open("banner.jpg")
+    # Render the main upper banner image
+    if os.path.exists("pankaj res.jpg"):
+        banner_img = Image.open("pankaj res.jpg")
         st.image(banner_img, use_column_width=True)
     else:
-        st.markdown("<h1 style='text-align: center;'>पंकज रेस्टोरेंट अँड स्वीट्स - अडावद</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; color:#D32F2F;'>पंकज रेस्टोरेंट अँड स्वीट्स - अडावद</h1>", unsafe_allow_html=True)
+        st.markdown("<h4 style='text-align: center; color: #cc0000;'>आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारल्या जातील.</h4>", unsafe_allow_html=True)
     
-    st.markdown("<h4 style='text-align: center; color: #cc0000;'>आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारल्या जातील.</h4>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns([2, 1])
@@ -150,16 +191,15 @@ if app_mode == "✨ Order Sweets & Snacks":
 
                 for item in items:
                     item_col, price_col, action_col = st.columns([3, 1, 1.5])
-
-                    # Get stock availability status safely
                     is_available = item.get("available", True)
 
                     with item_col:
-                        st.markdown(f"**{item['name']}**")
-                        st.caption(item["desc"])
+                        # Color fixed HTML injections
+                        st.markdown(f'<div class="product-title">{item["name"]}</div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="product-desc">{item["desc"]}</div>', unsafe_allow_html=True)
 
                     with price_col:
-                        st.markdown(f"**₹{item['price']}**")
+                        st.markdown(f'<div class="product-price">₹{item["price"]}</div>', unsafe_allow_html=True)
 
                     with action_col:
                         btn_key = f"add_{item['name']}_{category}"
@@ -174,7 +214,6 @@ if app_mode == "✨ Order Sweets & Snacks":
                                     }
                                 st.rerun()
                         else:
-                            # Visually striking Out of Stock Indicator
                             st.markdown('<div class="oos-badge">Out of Stock 🚫</div>', unsafe_allow_html=True)
                 st.markdown("---")
 
@@ -196,7 +235,7 @@ if app_mode == "✨ Order Sweets & Snacks":
 
                 cart_col1, cart_col2 = st.columns([3, 1])
                 with cart_col1:
-                    st.write(f"**{item_name}** x {details['qty']}")
+                    st.markdown(f"**{item_name}** x {details['qty']}")
                     st.caption(f"Price: ₹{item_total}")
                 with cart_col2:
                     if st.button("❌", key=f"remove_{item_name}"):
@@ -279,20 +318,16 @@ elif app_mode == "🔒 Admin Dashboard":
             
             for index, item in enumerate(items):
                 edit_col1, edit_col2, edit_col3, edit_col4 = st.columns([2.5, 1.5, 1.5, 1])
-                
-                # Check current availability setup
                 current_availability = item.get("available", True)
                 
                 with edit_col1:
-                    st.write(f"**{item['name']}**")
-                    st.caption(item['desc'])
+                    st.markdown(f'<div class="product-title">{item["name"]}</div>', unsafe_allow_html=True)
                 with edit_col2:
                     new_p = st.number_input(f"Price (₹)", min_value=1, value=item['price'], key=f"p_{category}_{index}")
                     if new_p != item['price']:
                         st.session_state.menu_data[category][index]['price'] = int(new_p)
                         save_menu(st.session_state.menu_data)
                 with edit_col3:
-                    # In-Stock / Out-of-Stock Status checkbox
                     stock_status = st.checkbox("In Stock ✅", value=current_availability, key=f"stock_{category}_{index}")
                     if stock_status != current_availability:
                         st.session_state.menu_data[category][index]['available'] = stock_status
