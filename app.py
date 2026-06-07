@@ -12,23 +12,26 @@ st.set_page_config(
 )
 
 # --- CONFIGURATION & STORAGE ---
-SHOP_WHATSAPP_NUMBER = "919623886387" 
+SHOP_WHATSAPP_NUMBER = "918623864774" 
 DATA_FILE = "menu.json"
 ADMIN_PASSWORD = "pankaj_admin"  # Change this to your preferred admin password
+MAPS_URL = "https://www.google.com/maps/place/Pankaj+Restaurant/@21.221159,75.4379684,17z/data=!3m1!4b1!4m6!3m5!1s0x3bd8e3005bbea4c9:0xab8ea2e4475c5b41!8m2!3d21.221159!4d75.4405433!16s%2Fg%2F11zkrvhsft?entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D"
 
-# Default menu items if no saved JSON file exists
+# Default menu items containing English and Marathi translation pairs
 DEFAULT_MENU = {
-    "Sweets 👑": [
-        {"name": "Kaju Katli (1kg)", "price": 800, "desc": "Premium cashew sweet made with 100% silver foil"},
-        {"name": "Gulab Jamun (1kg)", "price": 400, "desc": "Soft, juicy, and dipped in saffron sugar syrup"},
-        {"name": "Motichoor Laddoo (1kg)", "price": 350, "desc": "Made with pure desi ghee and dry fruits"},
-        {"name": "Rasgulla (12 Pcs)", "price": 250, "desc": "Spongy, light, and authentic Bengali style"},
+    "Sweets / मिठाई 👑": [
+        {"name": "Kaju Katli / काजू कतली (1kg)", "price": 800, "desc": "Premium cashew sweet / प्रीमियम काजूची ताजी मिठाई"},
+        {"name": "Gulab Jamun / गुलाब जामुन (1kg)", "price": 400, "desc": "Soft, juicy saffron sugar syrup / मऊ आणि रसाळ गुलाब जाम"},
+        {"name": "Rasgulla / रसगुल्ला (12 Pcs)", "price": 250, "desc": "Spongy, authentic Bengali style / स्पंजसारखा मऊ बंगाली रसगुल्ला"},
+        {"name": "Rasmalai / रसमलाई (Per Plate)", "price": 50, "desc": "Rich, creamy saffron milk sweet / केशरयुक्त मलईदार आणि चविष्ट रसमलाई"},
+        {"name": "Badam Barfi / बदाम बर्फी (1kg)", "price": 450, "desc": "Made with real almonds and ghee / शुद्ध तूप आणि बदामाची स्वादिष्ट बर्फी"},
     ],
-    "Snacks 🌶️": [
-        {"name": "Samosa (Per Pc)", "price": 20, "desc": "Crispy pastry filled with perfectly spiced potatoes"},
-        {"name": "Kachori (Per Pc)", "price": 25, "desc": "Flaky crust with a savory, spiced lentil filling"},
-        {"name": "Dhokla (250g)", "price": 60, "desc": "Soft, fluffy steamed gram flour tempered with mustard seeds"},
-        {"name": "Aloo Tikki (Per Plate)", "price": 50, "desc": "Crispy potato patties served with sweet & tangy chutneys"},
+    "Snacks / नाश्ता 🌶️": [
+        {"name": "Samosa / समोसा (Per Pc)", "price": 10, "desc": "Crispy pastry with spiced potatoes / गरमागरम बटाटा सारण भरलेला कुरकुरीत समोसा"},
+        {"name": "Kachori / कचोरी (Per Pc)", "price": 10, "desc": "Flaky crust with savory lentil filling / खमंग मसाला आणि डाळीने भरलेली शेव कचोरी"},
+        {"name": "Jalebi / जलेबी (250g)", "price": 75, "desc": "Soft, juicy and crispy tempered with ghee / शुद्ध तुपात तळलेली कुरकुरीत रसाळ जिलेबी"},
+        {"name": "Bhajiya / भजी (Per Plate)", "price": 30, "desc": "Crispy fried onion or potato fritters / गरमागरम आणि कुरकुरीत कांदा किंवा बटाटा भजी"},
+        {"name": "Poha / पोहे (Per Plate)", "price": 20, "desc": "Traditional spiced flattened rice / सुप्रसिद्ध चवदार कांदा पोहे"},
     ],
 }
 
@@ -55,9 +58,10 @@ if "cart" not in st.session_state:
 
 # --- SIDEBAR LOGO & NAVIGATION ---
 st.sidebar.markdown("<center>", unsafe_allow_html=True)
-if os.path.exists("logo.jpg"):
-    logo_img = Image.open("logo.jpg")
-    st.sidebar.image(logo_img, use_column_width=True)
+# Primary placement for Brand Logo asset
+if os.path.exists("viru logo cmyk.jpg"):
+    logo_img = Image.open("viru logo cmyk.jpg")
+    st.sidebar.image(logo_img, use_container_width=True)
 else:
     st.sidebar.title("🏪 पंकज रेस्टोरेंट")
 st.sidebar.markdown("</center>", unsafe_allow_html=True)
@@ -65,28 +69,38 @@ st.sidebar.markdown("</center>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 app_mode = st.sidebar.radio("पंकज रेस्टोरेंट मेनू:", ["✨ Order Sweets & Snacks", "🔒 Admin Dashboard"])
 st.sidebar.markdown("---")
-st.sidebar.info("📍 पत्ता: अडावद\n📞 मो. 9623886387")
+
+st.sidebar.info("📍 पत्ता: अडावद\n📞 मो. 9623886387\n👨‍🍳 प्रो.प्रा. पंकज बैरागी / एम. बी. बैरागी")
+
+# Integrated interactive location button 
+st.sidebar.link_button("📍 View Shop on Google Maps", MAPS_URL, use_container_width=True)
 
 
 # ==============================================================================
 # VIEW 1: BRANDED CUSTOMER MENU
 # ==============================================================================
 if app_mode == "✨ Order Sweets & Snacks":
-    # Display the top banner image if it exists
-    if os.path.exists("banner.jpg"):
-        banner_img = Image.open("banner.jpg")
-        st.image(banner_img, use_column_width=True)
+    # Red Horizontal Banner placement at the top
+    if os.path.exists("pankaj res.jpg"):
+        banner_img = Image.open("pankaj res.jpg")
+        st.image(banner_img, use_container_width=True)
     else:
         st.title("पंकज रेस्टोरेंट अँड स्वीट्स - अडावद")
     
-    st.markdown("<h4 style='text-align: center; color: #cc0000;'>आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारल्या जातील.</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>उत्तम क्वालिटी व चविष्ट नास्ता !! आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारल्या जातील.</h4>", unsafe_allow_html=True)
     st.markdown("---")
 
-    col1, col2 = st.columns([2, 1])
+    col1, col2 = st.columns([1.8, 1.2])
 
-    # Left Column: Interactive Menu List
+    # Left Column: Interactive Menu List & Showcase Image
     with col1:
-        st.header("📋 Explore Our Menu")
+        st.header("📋 Explore Our Menu / आमचा मेनू")
+        
+        # Display the visual menu grid card image inside the ordering panel
+        if os.path.exists("4 by 6 pankaj res copy.jpg"):
+            showcase_img = Image.open("4 by 6 pankaj res copy.jpg")
+            st.image(showcase_img, caption="Our Special Sweets & Snacks", use_container_width=True)
+            st.markdown("---")
 
         for category, items in st.session_state.menu_data.items():
             if items: 
@@ -104,7 +118,7 @@ if app_mode == "✨ Order Sweets & Snacks":
 
                     with action_col:
                         btn_key = f"add_{item['name']}_{category}"
-                        if st.button(f"Add to Cart", key=btn_key):
+                        if st.button("Add to Cart / जोडा", key=btn_key, use_container_width=True):
                             if item["name"] in st.session_state.cart:
                                 st.session_state.cart[item["name"]]["qty"] += 1
                             else:
@@ -117,7 +131,7 @@ if app_mode == "✨ Order Sweets & Snacks":
 
     # Right Column: Cart System & WhatsApp Generation
     with col2:
-        st.header("🛒 Your Basket")
+        st.header("🛒 Your Basket / तुमची टोपली")
 
         if not st.session_state.cart:
             st.info("Your cart is empty. Add items from the menu!")
@@ -148,16 +162,16 @@ if app_mode == "✨ Order Sweets & Snacks":
             st.write(f"### **Total Amount: ₹{total_bill}**")
 
             # Form fields
-            st.subheader("🚚 Delivery Details")
+            st.subheader("🚚 Delivery Details / पत्ता तपशील")
             name = st.text_input("Your Name*", placeholder="Enter full name")
             phone = st.text_input("Phone Number*", placeholder="10-digit mobile number")
-            order_type = st.radio("Order Type", ["Home Delivery", "Store Pickup"])
-            address = st.text_area("Delivery Address", placeholder="Required for Home Delivery")
+            order_type = st.radio("Order Type", ["Home Delivery / घरपोच सेवा", "Store Pickup / दुकानातून घेणे"])
+            address = st.text_area("Delivery Address", placeholder="Required for Home Delivery (घरपोच सेवेसाठी आवश्यक)")
 
             if st.button("Place Order via WhatsApp ✅", use_container_width=True):
                 if not name or not phone:
                     st.error("Please fill out your Name and Phone Number.")
-                elif order_type == "Home Delivery" and not address:
+                elif "Home Delivery" in order_type and not address:
                     st.error("Please provide a delivery address.")
                 else:
                     whatsapp_msg = (
@@ -165,7 +179,7 @@ if app_mode == "✨ Order Sweets & Snacks":
                         f"👤 *Customer:* {name}\n"
                         f"📞 *Phone:* {phone}\n"
                         f"📦 *Type:* {order_type}\n"
-                        f"📍 *Address:* {address if order_type == 'Home Delivery' else 'N/A'}\n\n"
+                        f"📍 *Address:* {address if 'Home Delivery' in order_type else 'N/A'}\n\n"
                         f"📋 *Items Ordered:*\n{order_summary_text}\n"
                         f"💰 *Total Bill Amount:* ₹{total_bill}\n\n"
                         f"Please confirm my order!"
@@ -195,9 +209,9 @@ elif app_mode == "🔒 Admin Dashboard":
         st.subheader("➕ Add New Item to Menu")
         with st.form("add_item_form", clear_on_submit=True):
             new_category = st.selectbox("Select Category", list(st.session_state.menu_data.keys()))
-            new_name = st.text_input("Product Name")
+            new_name = st.text_input("Product Name (e.g. Kaju Katli / काजू कतली)")
             new_price = st.number_input("Price (₹)", min_value=1, step=5)
-            new_desc = st.text_input("Short Description")
+            new_desc = st.text_input("Short Description (English & Marathi)")
             
             submit_new_item = st.form_submit_button("Add Item")
             if submit_new_item:
@@ -215,7 +229,6 @@ elif app_mode == "🔒 Admin Dashboard":
         for category, items in st.session_state.menu_data.items():
             st.write(f"### {category}")
             
-            # Using a reversed or indexed loop safely so deletion doesn't break rendering context indices
             for index, item in enumerate(items):
                 edit_col1, edit_col2, edit_col3 = st.columns([3, 2, 1])
                 with edit_col1:
@@ -227,7 +240,7 @@ elif app_mode == "🔒 Admin Dashboard":
                         st.session_state.menu_data[category][index]['price'] = int(new_p)
                         save_menu(st.session_state.menu_data) # Permanent save on price adjustment
                 with edit_col3:
-                    if st.button("🗑️ Delete", key=f"del_{category}_{index}"):
+                    if st.button("🗑️ Delete", key=f"del_{category}_{index}", use_container_width=True):
                         st.session_state.menu_data[category].pop(index)
                         save_menu(st.session_state.menu_data) # Permanent save on deletion
                         st.rerun()
