@@ -14,22 +14,24 @@ st.set_page_config(
 # --- CONFIGURATION & STORAGE ---
 SHOP_WHATSAPP_NUMBER = "918623864774" 
 DATA_FILE = "menu.json"
-ADMIN_PASSWORD = "pankaj_admin"  # Change this to your preferred admin password
+ADMIN_PASSWORD = "pankaj_admin"  
 MAPS_URL = "https://www.google.com/maps/place/Pankaj+Restaurant/@21.221159,75.4379684,17z/data=!3m1!4b1!4m6!3m5!1s0x3bd8e3005bbea4c9:0xab8ea2e4475c5b41!8m2!3d21.221159!4d75.4405433!16s%2Fg%2F11zkrvhsft?entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D"
 
-# Default menu items containing English and Marathi translation pairs
+# Master Bilingual Menu Items list
 DEFAULT_MENU = {
     "Sweets / मिठाई 👑": [
         {"name": "Kaju Katli / काजू कतली (1kg)", "price": 800, "desc": "Premium cashew sweet / प्रीमियम काजूची ताजी मिठाई"},
         {"name": "Gulab Jamun / गुलाब जामुन (1kg)", "price": 400, "desc": "Soft, juicy saffron sugar syrup / मऊ आणि रसाळ गुलाब जाम"},
         {"name": "Rasgulla / रसगुल्ला (12 Pcs)", "price": 250, "desc": "Spongy, authentic Bengali style / स्पंजसारखा मऊ बंगाली रसगुल्ला"},
         {"name": "Rasmalai / रसमलाई (Per Plate)", "price": 50, "desc": "Rich, creamy saffron milk sweet / केशरयुक्त मलईदार आणि चविष्ट रसमलाई"},
-        {"name": "Badam Barfi / बदाम बर्फी (1kg)", "price": 450, "desc": "Made with real almonds and ghee / शुद्ध तूप आणि बदामाची स्वादिष्ट बर्फी"},
+        {"name": "Badam Barfi / बदलम बर्फी (1kg)", "price": 450, "desc": "Made with real almonds and ghee / शुद्ध तूप आणि बदामाची स्वादिष्ट बर्फी"},
     ],
     "Snacks / नाश्ता 🌶️": [
+        {"name": "Pav Vada / पाव वडा (Per Pc)", "price": 10, "desc": "Spicy potato fritter inside fresh bread / germa-garam chavista pav vada"},
+        {"name": "Aloo Vada / बटाटा वडा (Per Pc)", "price": 20, "desc": "Deep fried spiced potato dumpling / paramparik chavdar batata vada"},
         {"name": "Samosa / समोसा (Per Pc)", "price": 10, "desc": "Crispy pastry with spiced potatoes / गरमागरम बटाटा सारण भरलेला कुरकुरीत समोसा"},
         {"name": "Kachori / कचोरी (Per Pc)", "price": 10, "desc": "Flaky crust with savory lentil filling / खमंग मसाला आणि डाळीने भरलेली शेव कचोरी"},
-        {"name": "Jalebi / जलेबी (250g)", "price": 75, "desc": "Soft, juicy and crispy tempered with ghee / शुद्ध तुपात तळलेली कुरकुरीत रसाळ जिलेबी"},
+        {"name": "Jalebi / जिलेबी (250g)", "price": 75, "desc": "Soft, juicy and crispy tempered with ghee / शुद्ध तुपात तळलेली कुरकुरीत रसाळ जिलेबी"},
         {"name": "Bhajiya / भजी (Per Plate)", "price": 30, "desc": "Crispy fried onion or potato fritters / गरमागरम आणि कुरकुरीत कांदा किंवा बटाटा भजी"},
         {"name": "Poha / पोहे (Per Plate)", "price": 20, "desc": "Traditional spiced flattened rice / सुप्रसिद्ध चवदार कांदा पोहे"},
     ],
@@ -40,7 +42,11 @@ def load_menu():
     if os.path.exists(DATA_FILE):
         try:
             with open(DATA_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
+                saved_data = json.load(f)
+                if "Sweets / मिठाई 👑" not in saved_data:
+                    save_menu(DEFAULT_MENU)
+                    return DEFAULT_MENU
+                return saved_data
         except:
             return DEFAULT_MENU
     return DEFAULT_MENU
@@ -58,12 +64,17 @@ if "cart" not in st.session_state:
 
 # --- SIDEBAR LOGO & NAVIGATION ---
 st.sidebar.markdown("<center>", unsafe_allow_html=True)
-# Primary placement for Brand Logo asset
-if os.path.exists("viru logo cmyk.jpg"):
+
+# Checks for new 'viru logo copy.jpg' first, defaults to original if missing
+if os.path.exists("viru logo copy.jpg"):
+    logo_img = Image.open("viru logo copy.jpg")
+    st.sidebar.image(logo_img, use_container_width=True)
+elif os.path.exists("viru logo cmyk.jpg"):
     logo_img = Image.open("viru logo cmyk.jpg")
     st.sidebar.image(logo_img, use_container_width=True)
 else:
     st.sidebar.title("🏪 पंकज रेस्टोरेंट")
+
 st.sidebar.markdown("</center>", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
@@ -71,8 +82,6 @@ app_mode = st.sidebar.radio("पंकज रेस्टोरेंट मे�
 st.sidebar.markdown("---")
 
 st.sidebar.info("📍 पत्ता: अडावद\n📞 मो. 9623886387\n👨‍🍳 प्रो.प्रा. पंकज बैरागी / एम. बी. बैरागी")
-
-# Integrated interactive location button 
 st.sidebar.link_button("📍 View Shop on Google Maps", MAPS_URL, use_container_width=True)
 
 
@@ -80,14 +89,13 @@ st.sidebar.link_button("📍 View Shop on Google Maps", MAPS_URL, use_container_
 # VIEW 1: BRANDED CUSTOMER MENU
 # ==============================================================================
 if app_mode == "✨ Order Sweets & Snacks":
-    # Red Horizontal Banner placement at the top
     if os.path.exists("pankaj res.jpg"):
         banner_img = Image.open("pankaj res.jpg")
         st.image(banner_img, use_container_width=True)
     else:
         st.title("पंकज रेस्टोरेंट अँड स्वीट्स - अडावद")
     
-    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>उत्तम क्वालिटी व चविष्ट नास्ता !! आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारल्या जातील.</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>उत्तम क्वालिटी व चविष्ट नास्ता !! आमच्याकडे सर्व प्रकारचे आदेश स्वीकारल्या जातील.</h4>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns([1.8, 1.2])
@@ -96,8 +104,12 @@ if app_mode == "✨ Order Sweets & Snacks":
     with col1:
         st.header("📋 Explore Our Menu / आमचा मेनू")
         
-        # Display the visual menu grid card image inside the ordering panel
-        if os.path.exists("4 by 6 pankaj res copy.jpg"):
+        # Checks for new '4 by 6 pankaj res copy_2.jpg' first, defaults to old filename if missing
+        if os.path.exists("4 by 6 pankaj res copy_2.jpg"):
+            showcase_img = Image.open("4 by 6 pankaj res copy_2.jpg")
+            st.image(showcase_img, caption="Our Special Sweets & Snacks", use_container_width=True)
+            st.markdown("---")
+        elif os.path.exists("4 by 6 pankaj res copy.jpg"):
             showcase_img = Image.open("4 by 6 pankaj res copy.jpg")
             st.image(showcase_img, caption="Our Special Sweets & Snacks", use_container_width=True)
             st.markdown("---")
@@ -200,7 +212,6 @@ elif app_mode == "🔒 Admin Dashboard":
     st.caption("Add stock or alter items instantaneously.")
     st.markdown("---")
 
-    # Simple Password Protection Gate
     passwd_input = st.text_input("Enter Admin Password to Unlock Panel", type="password")
     
     if passwd_input == ADMIN_PASSWORD:
@@ -219,7 +230,7 @@ elif app_mode == "🔒 Admin Dashboard":
                     st.session_state.menu_data[new_category].append({
                         "name": new_name, "price": int(new_price), "desc": new_desc
                     })
-                    save_menu(st.session_state.menu_data) # Permanent save
+                    save_menu(st.session_state.menu_data) 
                     st.success(f"Added '{new_name}' successfully!")
                     st.rerun()
 
@@ -238,11 +249,11 @@ elif app_mode == "🔒 Admin Dashboard":
                     new_p = st.number_input(f"Price (₹)", min_value=1, value=item['price'], key=f"p_{category}_{index}")
                     if new_p != item['price']:
                         st.session_state.menu_data[category][index]['price'] = int(new_p)
-                        save_menu(st.session_state.menu_data) # Permanent save on price adjustment
+                        save_menu(st.session_state.menu_data) 
                 with edit_col3:
                     if st.button("🗑️ Delete", key=f"del_{category}_{index}", use_container_width=True):
                         st.session_state.menu_data[category].pop(index)
-                        save_menu(st.session_state.menu_data) # Permanent save on deletion
+                        save_menu(st.session_state.menu_data) 
                         st.rerun()
     elif passwd_input != "":
         st.error("Incorrect Password. Please try again.")
