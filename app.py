@@ -65,7 +65,7 @@ if "cart" not in st.session_state:
 # --- SIDEBAR LOGO & NAVIGATION ---
 st.sidebar.markdown("<center>", unsafe_allow_html=True)
 
-# Checks for logo images, defaults to text title
+# Checks for logo images, defaults to text title if missing
 if os.path.exists("viru logo copy.jpg"):
     st.sidebar.image(Image.open("viru logo copy.jpg"), use_container_width=True)
 elif os.path.exists("viru logo cmyk.jpg"):
@@ -91,7 +91,7 @@ if app_mode == "✨ Order Sweets & Snacks":
     else:
         st.title("पंकज रेस्टोरेंट अँड स्वीट्स - अडावद")
     
-    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>🍽️ शुद्धता, गुणवत्ता आणि अप्रतिम चव यांचा संगम  !! आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारले जातील.</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>🍽️ शुद्धता, गुणवत्ता आणि अप्रतिम चव यांचा संगम  !! आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारले जातील..</h4>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns([1.8, 1.2])
@@ -168,10 +168,10 @@ if app_mode == "✨ Order Sweets & Snacks":
 
             # Form fields
             st.subheader("🚚 Delivery Details / पत्ता तपशील")
-            name = st.text_input("Your Name*", placeholder="Enter full name")
-            phone = st.text_input("Phone Number*", placeholder="10-digit mobile number")
+            name = st.text_input("Your Name*", placeholder="Enter full name").strip()
+            phone = st.text_input("Phone Number*", placeholder="10-digit mobile number").strip()
             order_type = st.radio("Order Type", ["Home Delivery / घरपोच सेवा", "Store Pickup / दुकानातून घेणे"])
-            address = st.text_area("Delivery Address", placeholder="Required for Home Delivery (घरपोच सेवेसाठी आवश्यक)")
+            address = st.text_area("Delivery Address", placeholder="Required for Home Delivery (घरपोच सेवेसाठी आवश्यक)").strip()
 
             if st.button("Place Order via WhatsApp ✅", use_container_width=True):
                 if not name or not phone:
@@ -179,10 +179,13 @@ if app_mode == "✨ Order Sweets & Snacks":
                 elif "Home Delivery" in order_type and not address:
                     st.error("Please provide a delivery address.")
                 else:
+                    customer_phone = str(phone)
+                    customer_name = str(name)
+                    
                     whatsapp_msg = (
                         f"🔔 *NEW ORDER - PANKAJ RESTAURANT & SWEETS*\n\n"
-                        f"👤 *Customer:* {name}\n"
-                        f"📞 *Phone:* {phone}\n"
+                        f"👤 *Customer:* {customer_name}\n"
+                        f"📞 *Phone:* {customer_phone}\n"
                         f"📦 *Type:* {order_type}\n"
                         f"📍 *Address:* {address if 'Home Delivery' in order_type else 'N/A'}\n\n"
                         f"📋 *Items Ordered:*\n{order_summary_text}\n"
@@ -230,13 +233,12 @@ elif app_mode == "🔒 Admin Dashboard":
         st.markdown("---")
         st.subheader("⚙️ Current Inventory Management")
         
-        # Keep track of structural changes to apply AFTER loop evaluation finishes
+        # Track layout adjustments during continuous loop execution
         action_triggered = False
 
         for category, items in st.session_state.menu_data.items():
             st.write(f"### {category}")
             
-            # Use index tracking safely without breaking loop mutation
             for index, item in enumerate(items):
                 edit_col1, edit_col2, edit_col3 = st.columns([3, 2, 1])
                 with edit_col1:
@@ -248,13 +250,12 @@ elif app_mode == "🔒 Admin Dashboard":
                         st.session_state.menu_data[category][index]['price'] = int(new_p)
                         save_menu(st.session_state.menu_data) 
                 with edit_col3:
-                    # Clean separation spacing to mimic button rows gracefully
                     st.write("") 
                     if st.button("🗑️ Delete", key=f"del_{category}_{index}", use_container_width=True):
                         st.session_state.menu_data[category].pop(index)
                         save_menu(st.session_state.menu_data) 
                         action_triggered = True
-                        break # Break loop early to prevent index mismatch errors during deletion phase
+                        break 
             
             if action_triggered:
                 st.rerun()
