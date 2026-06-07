@@ -24,11 +24,11 @@ DEFAULT_MENU = {
         {"name": "Gulab Jamun / गुलाब जामुन (1kg)", "price": 400, "desc": "Soft, juicy saffron sugar syrup / मऊ आणि रसाळ गुलाब जाम"},
         {"name": "Rasgulla / रसगुल्ला (12 Pcs)", "price": 250, "desc": "Spongy, authentic Bengali style / स्पंजसारखा मऊ बंगाली रसगुल्ला"},
         {"name": "Rasmalai / रसमलाई (Per Plate)", "price": 50, "desc": "Rich, creamy saffron milk sweet / केशरयुक्त मलईदार आणि चविष्ट रसमलाई"},
-        {"name": "Badam Barfi / बदलम बर्फी (1kg)", "price": 450, "desc": "Made with real almonds and ghee / शुद्ध तूप आणि बदामाची स्वादिष्ट बर्फी"},
+        {"name": "Badam Barfi / बादाम बर्फी (1kg)", "price": 450, "desc": "Made with real almonds and ghee / शुद्ध तूप आणि बदामाची स्वादिष्ट बर्फी"},
     ],
     "Snacks / नाश्ता 🌶️": [
-        {"name": "Pav Vada / पाव वडा (Per Pc)", "price": 10, "desc": "Spicy potato fritter inside fresh bread / गरमागरम चविष्ट पाव वडा"},
-        {"name": "Aloo Vada / बटाटा वडा (Per Pc)", "price": 20, "desc": "Deep fried spiced potato dumpling / पारंपारिक चवदार बटाटा वडा"},
+        {"name": "Pav Vada / पाव वडा (Per Pc)", "price": 10, "desc": "Spicy potato fritter inside fresh bread / germa-garam chavista pav vada"},
+        {"name": "Aloo Vada / बटाटा वडा (Per Pc)", "price": 20, "desc": "Deep fried spiced potato dumpling / paramparik chavdar batata vada"},
         {"name": "Samosa / समोसा (Per Pc)", "price": 10, "desc": "Crispy pastry with spiced potatoes / गरमागरम बटाटा सारण भरलेला कुरकुरीत समोसा"},
         {"name": "Kachori / कचोरी (Per Pc)", "price": 10, "desc": "Flaky crust with savory lentil filling / खमंग मसाला आणि डाळीने भरलेली शेव कचोरी"},
         {"name": "Jalebi / जिलेबी (250g)", "price": 30, "desc": "Soft, juicy and crispy tempered with ghee / शुद्ध तुपात तळलेली कुरकुरीत रसाळ जिलेबी"},
@@ -47,7 +47,7 @@ def load_menu():
                     save_menu(DEFAULT_MENU)
                     return DEFAULT_MENU
                 return saved_data
-        except:
+        except Exception:
             return DEFAULT_MENU
     return DEFAULT_MENU
 
@@ -65,12 +65,11 @@ if "cart" not in st.session_state:
 # --- SIDEBAR LOGO & NAVIGATION ---
 st.sidebar.markdown("<center>", unsafe_allow_html=True)
 
+# Checks for logo images, defaults to text title
 if os.path.exists("viru logo copy.jpg"):
-    logo_img = Image.open("viru logo copy.jpg")
-    st.sidebar.image(logo_img, use_container_width=True)
+    st.sidebar.image(Image.open("viru logo copy.jpg"), use_container_width=True)
 elif os.path.exists("viru logo cmyk.jpg"):
-    logo_img = Image.open("viru logo cmyk.jpg")
-    st.sidebar.image(logo_img, use_container_width=True)
+    st.sidebar.image(Image.open("viru logo cmyk.jpg"), use_container_width=True)
 else:
     st.sidebar.title("🏪 पंकज रेस्टोरेंट")
 
@@ -88,12 +87,11 @@ st.sidebar.link_button("📍 View Shop on Google Maps", MAPS_URL, use_container_
 # ==============================================================================
 if app_mode == "✨ Order Sweets & Snacks":
     if os.path.exists("pankaj res.jpg"):
-        banner_img = Image.open("pankaj res.jpg")
-        st.image(banner_img, use_container_width=True)
+        st.image(Image.open("pankaj res.jpg"), use_container_width=True)
     else:
         st.title("पंकज रेस्टोरेंट अँड स्वीट्स - अडावद")
     
-    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>🍽️ शुद्धता, गुणवत्ता आणि अप्रतिम चव यांचा संगम  !! आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारले जातील. </h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color: #cc0000; font-weight: bold;'>🍽️ शुद्धता, गुणवत्ता आणि अप्रतिम चव यांचा संगम  !! आमच्याकडे सर्व प्रकारचे ऑर्डर स्वीकारले जातील.</h4>", unsafe_allow_html=True)
     st.markdown("---")
 
     col1, col2 = st.columns([1.8, 1.2])
@@ -103,12 +101,10 @@ if app_mode == "✨ Order Sweets & Snacks":
         st.header("📋 Explore Our Menu / आमचा मेनू")
         
         if os.path.exists("4 by 6 pankaj res copy_2.jpg"):
-            showcase_img = Image.open("4 by 6 pankaj res copy_2.jpg")
-            st.image(showcase_img, use_container_width=True)
+            st.image(Image.open("4 by 6 pankaj res copy_2.jpg"), caption="Our Special Sweets & Snacks", use_container_width=True)
             st.markdown("---")
         elif os.path.exists("4 by 6 pankaj res copy.jpg"):
-            showcase_img = Image.open("4 by 6 pankaj res copy.jpg")
-            st.image(showcase_img, use_container_width=True)
+            st.image(Image.open("4 by 6 pankaj res copy.jpg"), caption="Our Special Sweets & Snacks", use_container_width=True)
             st.markdown("---")
 
         for category, items in st.session_state.menu_data.items():
@@ -138,7 +134,7 @@ if app_mode == "✨ Order Sweets & Snacks":
                             st.rerun()
                 st.markdown("---")
 
-    # Right Column: Cart System & Instant WhatsApp Transfer
+    # Right Column: Cart System & WhatsApp Generation
     with col2:
         st.header("🛒 Your Basket / तुमची टोपली")
 
@@ -177,7 +173,6 @@ if app_mode == "✨ Order Sweets & Snacks":
             order_type = st.radio("Order Type", ["Home Delivery / घरपोच सेवा", "Store Pickup / दुकानातून घेणे"])
             address = st.text_area("Delivery Address", placeholder="Required for Home Delivery (घरपोच सेवेसाठी आवश्यक)")
 
-            # Instant Order Execution Mechanism
             if st.button("Place Order via WhatsApp ✅", use_container_width=True):
                 if not name or not phone:
                     st.error("Please fill out your Name and Phone Number.")
@@ -198,12 +193,8 @@ if app_mode == "✨ Order Sweets & Snacks":
                     encoded_msg = urllib.parse.quote(whatsapp_msg)
                     whatsapp_url = f"https://wa.me/{SHOP_WHATSAPP_NUMBER}?text={encoded_msg}"
                     
-                    # Clear the cart dynamically upon successful placement
-                    st.session_state.cart = {}
-                    
-                    # Open WhatsApp instantly in a new browser tab using standard HTML injection
-                    st.markdown(f'<meta http-equiv="refresh" content="0;URL=\'{whatsapp_url}\'">', unsafe_allow_html=True)
-                    st.info("Redirecting directly to WhatsApp... Please wait.")
+                    st.success("🎉 Order formatted cleanly!")
+                    st.markdown(f'[👉 Click Here to Complete Order on WhatsApp]({whatsapp_url})')
 
 
 # ==============================================================================
@@ -239,9 +230,13 @@ elif app_mode == "🔒 Admin Dashboard":
         st.markdown("---")
         st.subheader("⚙️ Current Inventory Management")
         
+        # Keep track of structural changes to apply AFTER loop evaluation finishes
+        action_triggered = False
+
         for category, items in st.session_state.menu_data.items():
             st.write(f"### {category}")
             
+            # Use index tracking safely without breaking loop mutation
             for index, item in enumerate(items):
                 edit_col1, edit_col2, edit_col3 = st.columns([3, 2, 1])
                 with edit_col1:
@@ -253,9 +248,16 @@ elif app_mode == "🔒 Admin Dashboard":
                         st.session_state.menu_data[category][index]['price'] = int(new_p)
                         save_menu(st.session_state.menu_data) 
                 with edit_col3:
+                    # Clean separation spacing to mimic button rows gracefully
+                    st.write("") 
                     if st.button("🗑️ Delete", key=f"del_{category}_{index}", use_container_width=True):
                         st.session_state.menu_data[category].pop(index)
                         save_menu(st.session_state.menu_data) 
-                        st.rerun()
+                        action_triggered = True
+                        break # Break loop early to prevent index mismatch errors during deletion phase
+            
+            if action_triggered:
+                st.rerun()
+                
     elif passwd_input != "":
         st.error("Incorrect Password. Please try again.")
